@@ -46,3 +46,23 @@ class DataManager:
         except Exception as e:
             print(f"Error al obtener datos: {e}")
             return pd.DataFrame() # Retornar vacío en caso de error
+        
+
+    def get_conditions_per_person(self):
+        """
+        Return data for conditions per person
+        """
+        query = """
+                SELECT COUNT(DISTINCT co.person_id) AS cnt , co.condition_concept_id, c.concept_name
+                FROM cdm_synthea10.condition_occurrence co
+                JOIN cdm_synthea10.concept c on c.concept_id = co.condition_concept_id
+                GROUP BY co.condition_concept_id, c.concept_name
+                ORDER BY cnt DESC
+                LIMIT 50;
+                """
+        try:
+            df = pd.read_sql(query, self.engine)
+            return df
+        except Exception as e:
+            print(f"Error al obtener datos: {e}")
+            return pd.DataFrame() # Retornar vacío en caso de error

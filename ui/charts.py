@@ -64,3 +64,41 @@ def create_histogram_bar_chart(df):
         figure=fig,
         expand=True,
     )
+
+def create_treemap_conditions(df):
+    if df.empty:
+        return ft.Text("No hay datos disponibles")
+
+    # Crear treemap con Plotly Express
+    fig = px.treemap(
+        df,
+        path=[px.Constant("All Conditions"), 'concept_name'],  # Jerarquía
+        values='cnt',  # Tamaño de cada bloque
+        color='cnt',  # Color basado en el conteo
+        color_continuous_scale='Blues',  # Escala de colores
+        hover_data={'cnt': ':,'},  # Formato del hover
+    )
+
+    # Personalizar layout
+    fig.update_layout(
+        margin=dict(l=10, r=10, t=30, b=10),
+        autosize=True,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font_color="black",
+    )
+
+    # Personalizar las etiquetas del treemap
+    fig.update_traces(
+        textposition="middle center",
+        textfont_size=12,
+        marker=dict(
+            line=dict(width=2, color='white')  # Borde blanco entre bloques
+        )
+    )
+
+    # Retornar PlotlyChart
+    return fch.PlotlyChart(
+        figure=fig,
+        expand=True,
+    )
