@@ -1,10 +1,36 @@
 import plotly.express as px
-import flet as ft
-import flet_charts as fch
+import plotly.graph_objects as go
+
+
+def create_big_number(df):
+    if df.empty:
+        return None
+    
+    # Obtener el valor (asumiendo primera fila, primera columna)
+    value = df.iloc[0, 0]
+
+    # Crear indicador (Big Number)
+    fig = go.Figure(go.Indicator(
+        mode = "number",
+        value = value,
+        number = {'font': {'size': 80, 'color': '#1976D2'}}, # Azul corporativo
+        domain = {'x': [0, 1], 'y': [0, 1]}
+    ))
+    
+    # Personalizar Layout
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=0, r=0, t=0, b=0),
+        height=250, # Altura ajustada para centrado vertical
+    )
+    
+    return fig
+        
 
 def create_sex_pie_chart(df):
     if df.empty:
-        return ft.Text("No hay datos disponibles")
+        return None
 
     # Crear gráfico con Plotly Express
     fig = px.pie(
@@ -24,12 +50,12 @@ def create_sex_pie_chart(df):
         font_color="black"
     )
 
-    # Retornar el control de Flet
-    return fch.PlotlyChart(figure=fig, expand=True)
+    # Retornar figura de Plotly
+    return fig
 
 def create_histogram_bar_chart(df):
     if df.empty:
-        return ft.Text("No hay datos disponibles")
+        return None
 
     # Crear gráfica en Plotly
     fig = px.histogram(
@@ -59,15 +85,12 @@ def create_histogram_bar_chart(df):
     # Color de las barras
     fig.update_traces(marker_color='rgb(108, 142, 168)')
 
-    # Retornar PlotlyChart con las propiedades correctas
-    return fch.PlotlyChart(
-        figure=fig,
-        expand=True,
-    )
+    # Retornar figura de Plotly
+    return fig
 
 def create_treemap_conditions(df):
     if df.empty:
-        return ft.Text("No hay datos disponibles")
+        return None
 
     # Crear treemap con Plotly Express
     fig = px.treemap(
@@ -97,8 +120,5 @@ def create_treemap_conditions(df):
         )
     )
 
-    # Retornar PlotlyChart
-    return fch.PlotlyChart(
-        figure=fig,
-        expand=True,
-    )
+    # Retornar figura de Plotly
+    return fig
