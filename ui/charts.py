@@ -1,5 +1,6 @@
 import plotly.express as px
 import plotly.graph_objects as go
+import pandas as pd
 
 
 def create_big_number(df):
@@ -121,4 +122,35 @@ def create_treemap_conditions(df):
     )
 
     # Retornar figura de Plotly
+    return fig
+
+def create_line_chart_time(df):
+    if df.empty:
+        return None
+    
+    # Convertir columnas de valores a numérico (float) para evitar problemas con tipos Decimal u Object
+    df_plot = df.copy()
+    for col in df_plot.columns[1:]:
+        df_plot[col] = pd.to_numeric(df_plot[col], errors='coerce')
+
+    # Crear gráfica en plotly
+    fig = px.line(
+        df_plot, 
+        x=df_plot.columns[0],
+        y=df_plot.columns[1:],
+        template="plotly_white",)
+    
+    return fig
+
+def create_box_plot(df):
+    if df.empty:
+        return None
+
+    # Crear gráfica en plotly
+    fig = px.box(
+        df, 
+        x = df.columns[1],
+        y = df.columns[2],
+        template="plotly_white",)
+    
     return fig

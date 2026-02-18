@@ -1,6 +1,6 @@
 import streamlit as st
 from database.db_manager import DataManager
-from ui.charts import create_sex_pie_chart, create_histogram_bar_chart, create_treemap_conditions, create_big_number
+from ui.charts import create_sex_pie_chart, create_histogram_bar_chart, create_treemap_conditions, create_big_number, create_line_chart_time, create_box_plot
 
 
 # Configuración de la página (debe ser lo primero)
@@ -8,7 +8,7 @@ st.set_page_config(
     page_title="Dashboard OMOP CDM",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Cargar estilos CSS
@@ -37,10 +37,7 @@ def render_card(title, fig, footer_title, footer_desc):
         </div>
     ''', unsafe_allow_html=True)
 
-def main():
-    # 1. Instanciar gestor de datos
-    data_manager = DataManager()
-    
+def view_dashboard():
     # 2. Obtener datos (ahora con caché)
     with st.spinner('Cargando datos...'):
         df_patients = data_manager.get_count_patients()
@@ -94,5 +91,77 @@ def main():
         footer_desc="Distribution of medical conditions across the patient cohort. Top 50 most common conditions."
     )
 
+def view_data_density():
+    st.title("📂 Data Density")
+    st.markdown("---")
+
+    with st.spinner('Cargando datos...'):
+        df_data_density = data_manager.get_data_density_total_rows()
+        df_data_avg_records = data_manager.get_avg_records_per_person_per_month()
+        df_data_records_domain = data_manager.get_records_per_person_per_domain()
+
+    # Fila 1: densidad de datos
+    render_card(
+        title="Data density - Records",
+        fig= create_line_chart_time(df_data_density),
+        footer_title="10K Pregnant woman",
+        footer_desc="Number of records of each domain per month."
+    )
+    
+    st.write("###") # Espaciador
+
+    # Fila 2: Promedio de records por mes por persona
+    render_card(
+        title="Data density - Records",
+        fig= create_line_chart_time(df_data_avg_records),
+        footer_title="10K Pregnant woman",
+        footer_desc="Number of average records per person of each domain per month."
+    )
+
+    st.write("###") # Espaciador
+
+    # Fila 3: Boxplots de records por persona
+
+    render_card(
+        title="Data density - Concepts",
+        fig= create_box_plot(df_data_records_domain),
+        footer_title="10K Pregnant woman",
+        footer_desc="Boxplot of records per person of each domain"
+    )
+
+    
+def view_placeholder(title):
+    st.title(f"📂 {title}")
+    st.markdown("---")
+    st.info(f"La sección **{title}** está en construcción. Aquí se cargarán las gráficas correspondientes.")
+
+def main():
+    st.sidebar.title("Navegación")
+    
+    page = st.sidebar.radio(
+        "Seleccione una vista:",
+        [
+            "Dashboard",
+            "Data density",
+            "Person",
+            "Visit",
+            "Condition Ocurrence",
+            "Procedure",
+            "Drug Exposure",
+            "Measurement",
+            "Observation",
+            "Death"
+        ]
+    )
+
+    if page == "Dashboard":
+        view_dashboard()
+    elif page == "Data density":
+        view_data_density()
+    else:
+        view_placeholder(page)
+
 if __name__ == "__main__":
+    # 1. Instanciar gestor de datos
+    data_manager = DataManager()
     main()
