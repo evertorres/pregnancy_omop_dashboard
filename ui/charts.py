@@ -28,8 +28,7 @@ def create_big_number(df):
     
     return fig
         
-
-def create_sex_pie_chart(df):
+def create_pie_chart(df):
     if df.empty:
         return None
 

@@ -53,7 +53,44 @@ class DataManager:
         except Exception as e:
             print(f"Error al obtener datos: {e}")
             return pd.DataFrame() # Retornar vacío en caso de error
+
+    @st.cache_data
+    def get_race(_self):
+        """
+        Return data for race pie
+        """
+        engine = _self.get_engine()
+        query = """
+        SELECT person.race_concept_id, concept.concept_name, count(person.race_concept_id) as total
+        FROM cdm_synthea10.person
+        LEFT JOIN cdm_synthea10.concept on concept.concept_id = person.race_concept_id
+        GROUP BY person.race_concept_id, concept.concept_name;
+        """
+        try:
+            df = pd.read_sql(query, engine)
+            return df
+        except Exception as e:
+            print(f"Error al obtener datos: {e}")
+            return pd.DataFrame() # Retornar vacío en caso de error
         
+    @st.cache_data
+    def get_ethnicity(_self):
+        """
+        Return data for race pie
+        """
+        engine = _self.get_engine()
+        query = """
+        SELECT person.ethnicity_concept_id, concept.concept_name, count(person.ethnicity_concept_id) as total
+        FROM cdm_synthea10.person
+        LEFT JOIN cdm_synthea10.concept on concept.concept_id = person.ethnicity_concept_id
+        GROUP BY person.ethnicity_concept_id, concept.concept_name;
+        """
+        try:
+            df = pd.read_sql(query, engine)
+            return df
+        except Exception as e:
+            print(f"Error al obtener datos: {e}")
+            return pd.DataFrame() # Retornar vacío en caso de error
 
     @st.cache_data
     def get_age_at_first_seen(_self):
@@ -308,3 +345,18 @@ class DataManager:
             print(f"Error al obtener datos: {e}")
             return pd.DataFrame() # Retornar vacío en caso de error
         
+    @st.cache_data
+    def get_year_of_birth_patients(_self):
+        """
+        Return the year of birth of patients
+        """
+        engine = _self.get_engine()
+        query = """SELECT person_id, year_of_birth as age_in_years
+                   FROM cdm_synthea10.person"""
+        
+        try:
+            df = pd.read_sql(query, engine)
+            return df
+        except Exception as e:
+            print(f"Error al obtener datos: {e}")
+            return pd.DataFrame() # Retornar vacío en caso de error
