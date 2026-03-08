@@ -110,7 +110,6 @@ class DataManager:
             print(f"Error al obtener datos: {e}")
             return pd.DataFrame() # Retornar vacío en caso de error
         
-
     @st.cache_data
     def get_conditions_per_person(_self):
         """
@@ -354,6 +353,75 @@ class DataManager:
         query = """SELECT person_id, year_of_birth as age_in_years
                    FROM cdm_synthea10.person"""
         
+        try:
+            df = pd.read_sql(query, engine)
+            return df
+        except Exception as e:
+            print(f"Error al obtener datos: {e}")
+            return pd.DataFrame() # Retornar vacío en caso de error
+
+    @st.cache_data
+    def get_visits_concepts(_self):
+        """
+        Return the concepts of visits
+        """
+        engine = _self.get_engine()
+        query = """SELECT visit_concept_id, concept_name, COUNT(*) as cnt
+                FROM cdm_synthea10.visit_occurrence v
+                JOIN cdm_synthea10.concept c on c.concept_id = v.visit_concept_id
+                GROUP BY visit_concept_id, concept_name
+                ORDER BY cnt DESC
+                LIMIT 50;"""
+        
+        try:
+            df = pd.read_sql(query, engine)
+            return df
+        except Exception as e:
+            print(f"Error al obtener datos: {e}")
+            return pd.DataFrame() # Retornar vacío en caso de error
+        
+    @st.cache_data
+    def get_visits_duration(_self):
+        """
+        Return the duration of visits
+        """
+        engine = _self.get_engine()
+        query = """WITH visit_duration AS (
+                                        SELECT 
+                                            visit_occurrence_id,
+                                            visit_start_datetime,
+                                            visit_end_datetime,
+                                            (EXTRACT(EPOCH FROM (visit_end_datetime - visit_start_datetime))) / 86400 AS length_of_stay_days
+                                        FROM 
+                                            cdm_synthea10.visit_occurrence
+                                    )
+                                    SELECT 
+                                        AVG (length_of_stay_days)
+                                    FROM 
+                                        visit_duration
+                                    WHERE 
+                                        length_of_stay_days <= 365;"""
+        
+        try:
+            df = pd.read_sql(query, engine)
+            return df
+        except Exception as e:
+            print(f"Error al obtener datos: {e}")
+            return pd.DataFrame() # Retornar vacío en caso de error
+        
+    @st.cache_data
+    def get_visit_type_concept_id(_self):
+        """
+        Return the visit type concept id
+        """
+        engine = _self.get_engine()
+        query = """ SELECT visit_type_concept_id, concept_name, COUNT(*) as cnt
+                    FROM cdm_synthea10.visit_occurrence v
+                    JOIN cdm_synthea10.concept c on c.concept_id = v.visit_type_concept_id
+                    GROUP BY visit_type_concept_id, concept_name
+                    ORDER BY cnt DESC
+                    LIMIT 50;"""
+
         try:
             df = pd.read_sql(query, engine)
             return df

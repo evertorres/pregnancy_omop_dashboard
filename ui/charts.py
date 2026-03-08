@@ -153,3 +153,16 @@ def create_box_plot(df):
         template="plotly_white",)
     
     return fig
+
+def create_bar_chart(df):
+    if df.empty:
+        return None
+
+    # Crear gráfica en plotly
+    fig = px.bar(
+        df, 
+        x = df.columns[0],
+        y = df.columns[1],
+        template="plotly_white",)
+    
+    return fig

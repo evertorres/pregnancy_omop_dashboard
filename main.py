@@ -1,6 +1,6 @@
 import streamlit as st
 from database.db_manager import DataManager
-from ui.charts import create_pie_chart, create_histogram_bar_chart, create_treemap_conditions, create_big_number, create_line_chart_time, create_box_plot
+from ui.charts import create_pie_chart, create_histogram_bar_chart, create_treemap_conditions, create_big_number, create_line_chart_time, create_box_plot, create_bar_chart
 
 
 
@@ -177,7 +177,41 @@ def view_person():
             footer_desc="Ethnicity distribution across the patient cohort."
         )
 
-     
+
+def view_visit():
+    st.title("👩‍⚕️ Visit")
+    st.markdown("---")
+
+    with st.spinner('Cargando datos...'):
+        df_data_visits_concepts = data_manager.get_visits_concepts()
+        df_data_visits_duration = data_manager.get_visits_duration()
+        df_data_visits_types = data_manager.get_visit_type_concept_id()
+    
+    render_card(
+        title="Visits",
+        fig=create_bar_chart(df_data_visits_concepts),
+        footer_title="10K Pregnant woman",
+        footer_desc="Visits concepts distribution across the patient cohort. Top 50 most common concepts."
+        )
+    
+    st.write("###") # Espaciador
+    col1, col2 = st.columns([1, 1]) # 50% y 50%
+
+    with col1:
+        render_card(
+        title="Visits duration (Days)",
+        fig=create_big_number(df_data_visits_duration),
+        footer_title="10K Pregnant woman",
+        footer_desc="Visits duration distribution across the patient cohort. (Less than 365 days)"
+        )
+    
+    with col2:
+        render_card(
+        title="Visits type concepts",
+        fig=create_bar_chart(df_data_visits_types),
+        footer_title="10K Pregnant woman",
+        footer_desc="Visits type concepts distribution across the patient cohort."
+        )
 
 def view_placeholder(title):
     st.title(f"📂 {title}")
@@ -209,6 +243,8 @@ def main():
         view_data_density()
     elif page == "Person":
         view_person()
+    elif page == "Visit":
+        view_visit()
     else:
         view_placeholder(page)
 
